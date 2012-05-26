@@ -64,22 +64,7 @@ public class TrackerGuard {
 		return exec.submit(call);
 	}
 	
-//	public Future<String> connect(){
-//		Callable<String> call = new Callable<String>() {
-//			@Override
-//			public String call() throws Exception {
-//				String result = "";
-//				try {
-//					result = trk.connect();
-//				} catch (TrackerException e) {
-//					result = "Message from exception: " + e.getMessage();
-//					e.printStackTrace();
-//				}
-//				return result;
-//			}
-//		};
-//		return exec.submit(call);
-//	}
+
 	
 //	public Future<String> disconnect() {
 //		Callable<String> call = new Callable<String>() {
