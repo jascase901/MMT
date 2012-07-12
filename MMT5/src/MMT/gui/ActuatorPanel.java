@@ -36,7 +36,7 @@ public class ActuatorPanel extends JPanel implements ActionListener {
      * because Lists are nice to deal with, but we also need to store
      * it in a JList for GUI-related purposes. */
     public ArrayList<Actuator> actuatorList;
-    private JList actuatorJList;
+    private JList<Actuator> actuatorJList;
     
     // And we have a HistoryPane for logging all our messages:
     private final HistoryPane history;
@@ -58,7 +58,7 @@ public class ActuatorPanel extends JPanel implements ActionListener {
         // Build our list of all actuators as well as the JList to
         //  display it to the user:
         this.actuatorList = this.findAllActuators();
-        this.actuatorJList = new JList(this.actuatorList.toArray());
+        this.actuatorJList = new JList<Actuator>(this.actuatorList.toArray(new Actuator[] {}));
         
         // A SimpleButton is just a subclass of JButton with a nicer constructor:
         //  give it a name, a command message, and a listener for when it's clicked.
@@ -88,8 +88,7 @@ public class ActuatorPanel extends JPanel implements ActionListener {
             final double distance = this.getMicrons();
             if (Double.isNaN(distance)) return; // Couldn't parse the field.
             
-            for (Object o : this.actuatorJList.getSelectedValues()) {
-                final Actuator a = (Actuator) o;
+            for (final Actuator a : this.actuatorJList.getSelectedValuesList()) {
                 /* A HistoryPanel.Updater will run its getResult method, then
                  * update the HistoryPanel with the string getResult returns. */
                 (this.history.new Updater() {
@@ -113,8 +112,7 @@ public class ActuatorPanel extends JPanel implements ActionListener {
         else if (s.equals("getStatus")) {
             // We just want to update the HistoryPane with the status
             // of each selected actuator.
-            for (Object o : this.actuatorJList.getSelectedValues()) {
-                final Actuator a = (Actuator) o;
+            for (final Actuator a : this.actuatorJList.getSelectedValuesList()) {
                 (this.history.new Updater() {
                     @Override
                     public String getResult() {

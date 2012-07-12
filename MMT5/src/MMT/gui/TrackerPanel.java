@@ -47,7 +47,7 @@ public class TrackerPanel extends JPanel implements ActionListener {
     private JButton moveAbsoluteButton;
 
     // The box for selecting which measurement mode to set the tracker to:
-    private JComboBox modeBox;
+    private JComboBox<String> modeBox;
     private JButton setModeButton;
     
     // Fields for the user to enter coordinates:
@@ -76,7 +76,7 @@ public class TrackerPanel extends JPanel implements ActionListener {
         this.moveAbsoluteButton = new SimpleButton("Move absolute", "moveAbsolute", this);
         this.setModeButton = new SimpleButton("Set Mode", "setMode", this);
         
-        this.modeBox = new JComboBox(new String[] {"IFM", "ADM", "IFM set by ADM"});
+        this.modeBox = new JComboBox<String>(new String[] {"IFM", "ADM", "IFM set by ADM"});
         
         this.history = new HistoryPane();
         

@@ -16,6 +16,7 @@ import java.awt.Component;
 public class Main {
     private static void createAndShowGUI() {
         JFrame frame = new JFrame("ButtonDemo");
+	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         Row contentPane = new Row(new TrackerPanel(), new ActuatorPanel());
         contentPane.setOpaque(true);

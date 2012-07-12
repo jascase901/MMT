@@ -1,61 +1,98 @@
-/* This is the dummy FTDI class I made.
- * It returns boring status messages.
- * It's not well-documented because this file should never
- *  be read by anybody. In the next day or two, I should be
- *  testing things for real, using the real FTDI class.
- */
-
 package MMT.communications;
 
-import java.lang.InterruptedException;
 import java.io.IOException;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.Arrays;
+
+import com.ftdi.BitModes;
+import com.ftdi.FTD2XXException;
+import com.ftdi.FTDevice;
+import com.ftdi.Parity;
+import com.ftdi.StopBits;
+import com.ftdi.WordLength;
+
 
 public class FTDI {
-    // PUBLIC API
-    public static FTDI getInstance() {return instance;}
+    private static final FTDI INSTANCE = new FTDI();
+    private FTDevice ft232handle;
+    private FTDevice ft245handle;
+    public static FTDI getInstance() {return INSTANCE;}
     
-    // Writes a message out a given port:
-    public void write(byte[] message, int port) throws IOException {
-        byte checksum = (byte) 0;
-        for (byte b : message) checksum ^= b;
-
-        this.lock.lock();
-        if (checksum == 0) this.buffer += dummyResponse;
-        else this.buffer += badChecksumResponse;
-        this.lock.unlock();
-    }
-    public String read(int port) throws IOException {
-        this.lock.lock();
-        try {
-            String[] split = this.buffer.split("eol", 2);
-            
-            String result = split[0];
-            if (split.length > 1) this.buffer = split[1];
-            else this.buffer = "";
-            
-            return result;
-        } finally {this.lock.unlock();}
-    }
-    
-    // PRIVATE STUFF
-    
-    // Constructor
     private FTDI() {
-        buffer = "";
-        lock = new ReentrantLock();
+        try {
+            ft232handle = FTDevice.getDevicesBySerialNumber("A6007pN3").get(0);
+            ft245handle = FTDevice.getDevicesBySerialNumber("A3000wLU").get(0);
+        } catch (FTD2XXException e1) {
+            e1.printStackTrace();
+        }
+        try {
+            ft232handle.open();
+            ft232handle.setBaudRate(9600);
+            ft232handle.setDataCharacteristics(WordLength.BITS_8, StopBits.STOP_BITS_1, Parity.PARITY_NONE);
+            
+            ft245handle.open();
+            ft245handle.setBitMode((byte) 0xFF, BitModes.BITMODE_ASYNC_BITBANG);
+        } catch (FTD2XXException e) {
+            e.printStackTrace();
+        }
+        
     }
     
-    // Static stuff
-    private static final FTDI instance = new FTDI();
-    private static final String dummyResponse =
-        "AckB GSt Pos 32 Pot 9098 Enc 0 MtrHome eol";
-    private static final String badChecksumResponse =
-        "Bad checksum eol";
+    public void close() {
+        try {
+            ft245handle.close();
+            ft232handle.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     
-    // Instance members
-    private String buffer;
-    private ReentrantLock lock;
+    private void set245Port(int port) throws IOException {
+        /* If I understand my predecessor's code correctly, the port is a one-byte unsigned integer,
+         * and for some reason, the chip we're talking to reads that byte with big-endian bit order,
+         * while our computer uses little-endian bit order (or maybe vice versa). Point is, we need
+         * to reverse that byte. */
+        ft245handle.write(0xff &
+                          (((port << 7) & 128) | ((port << 5) & 64) | ((port << 3) & 32) | ((port << 1) & 16) |
+                           ((port >> 1) & 8) | ((port >> 3) & 4) | ((port >> 5) & 2) | ((port >> 7) & 1)));
+	// A more concise but infinitely more inscrutable implementation follows:
+        /* terrible hack to switch the actual bits of the port number
+         * required because the computer and the propeller chip use  little-endian and big-endian numbering
+         * example: if we want to use port 123
+         * 123 is represented as 01111011
+         * this next line of code will flip it to 11011110 */
+        //int flipped =  (char) (((port * 0x0802L & 0x22110L) | (port * 0x8020L & 0x88440L)) * 0x10101L >> 16);
+        //ft245handle.write(flipped);
+    }
     
+    private void purge245() throws FTD2XXException {
+        ft245handle.purgeBuffer(true, true);
+    }
     
+    private void purge232() throws FTD2XXException {
+        ft232handle.purgeBuffer(true, true);
+    }
+    
+    private void pause() {
+        try {
+            Thread.sleep(25);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void write(byte[] data, int port) throws IOException {
+        System.out.println(Arrays.toString(data));
+        purge245(); //remove any leftovers from the queues
+        purge232();
+        set245Port(port);
+        ft232handle.write(data);
+        pause(); //pause a bit so that when read() is called, there is something to be read
+        pause();
+    }
+    
+    public String read(int port) throws IOException {
+        set245Port(port);
+        byte[] read = ft232handle.read(ft232handle.getQueueStatus());
+        return new String(read);
+    }
 }
