@@ -1,0 +1,8 @@
+#!/bin/bash
+
+SEP=`./shell/findsep`
+LIBDIR=`./shell/findlibdir`
+CLASSPATH="$CLASSPATH$SEP$LIBDIR/*$SEP$LIBDIR/Tracker/*"
+
+cd bin
+java -classpath "$CLASSPATH" MMT/Main

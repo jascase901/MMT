@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [[ `uname` == CYG* ]]
+then
+  RESULT=";"
+else
+  RESULT=":"
+fi
+
+echo $RESULT

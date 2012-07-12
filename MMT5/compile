@@ -1,0 +1,7 @@
+#!/bin/bash
+
+SEP=`./shell/findsep`
+LIBDIR=`./shell/findlibdir`
+CLASSPATH="$CLASSPATH$SEP$LIBDIR/*$SEP$LIBDIR/Tracker/*$SEP./src/"
+
+javac -classpath "$CLASSPATH" -sourcepath src/ -d bin/ src/MMT/Main.java
