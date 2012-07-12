@@ -1,8 +1,8 @@
 #!/bin/bash
 
+HERE=`pwd`
 SEP=`./shell/findsep`
-LIBDIR=`./shell/findlibdir`
-CLASSPATH="$CLASSPATH$SEP$LIBDIR/*$SEP$LIBDIR/Tracker/*"
+CLASSPATH="$CLASSPATH$SEP$HERE/lib/$SEP$HERE/lib/*"
 
 cd bin
 java -classpath "$CLASSPATH" MMT/Main
