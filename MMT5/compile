@@ -1,4 +1,5 @@
 #!/bin/bash
+#
 
 SEP=`./shell/findsep`
 LIBDIR=`./shell/findlibdir`
