@@ -1,8 +1,8 @@
 #!/bin/bash
 #
 
+HERE=`pwd`
 SEP=`./shell/findsep`
-LIBDIR=`./shell/findlibdir`
-CLASSPATH="$CLASSPATH$SEP$LIBDIR/*$SEP$LIBDIR/Tracker/*$SEP./src/"
+CLASSPATH="$CLASSPATH$SEP$HERE/lib/$SEP$HERE/lib/*"
 
 javac -classpath "$CLASSPATH" -sourcepath src/ -d bin/ src/MMT/Main.java
