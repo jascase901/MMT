@@ -1,7 +1,6 @@
-I compile and run stuff from the command line. If you have a fancy IDE
-that knows how to do this for you, feel free to ignore this file, but
-if you don't, this should help you compile and run the MMT controller
-program.
+This file should help you compile and run the MMT controller program
+from the command line. That's what I do personally, but if you have a
+fancy IDE that can do it for you, feel free to ignore this file.
 
 To compile the project, open a shell and cd into the MMT5
 directory. Then run the command
