@@ -1,0 +1,16 @@
+This file should help you compile and run the MMT controller program
+from the command line. That's what I do personally, but if you have a
+fancy IDE that can do it for you, feel free to ignore this file.
+
+To compile the project, open a shell and cd into the MMT5
+directory. Then run the command
+
+  javac -sourcepath src/ -classpath "bin/;lib/*" -d bin/ src/MMT/Main.java
+
+(NOTE: the semicolon is the path separator for Windows -- for UNIX
+operating systems, use a colon instead. So the classpath would be
+"bin/:lib/*" instead.)
+
+To run it, cd into MMT5/bin and run
+
+  java -classpath ".;../lib/*" MMT/Main.java

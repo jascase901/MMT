@@ -1,0 +1,16 @@
+So, you're in the MMT5 directory. What do you see?
+
+- MMT5/bin/ contains the binary files (i.e. .class files) necessary to
+  run the MMT controller code.
+
+- MMT5/help/ contains general documentation that doesn't belong in any
+  of the .java files (which should each be thoroughly commented as
+  well).
+
+- MMT5/lib/ contains libraries made by other people that we use in
+  this package. At the time of writing, there are three .jar files
+  (Ftp, Tracker, Utility) to help talk to the laser tracker, and one
+  .jar file (JavaFTD2XX-0.2.5) to talk with the actuators.
+
+- MMT5/src/ contains the source files from which we compile the
+  controller program.
