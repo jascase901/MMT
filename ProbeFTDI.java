@@ -1,60 +1,48 @@
+/* This program prints information about any
+ * FTDI devices connected to the computer,
+ * particularly the ones corresponding to the
+ * actuator control boards.
+ */
+
 import java.util.List;
 
 import com.ftdi.FTD2XXException;
 import com.ftdi.FTDevice;
 
 public class ProbeFTDI {
-    public static void main(String[] args) {
-	System.out.println("Finding all devices...");
+    public static void main(String[] args) 
+    throws InterruptedException, FTD2XXException {
 	List<FTDevice> devices;
-	try {
-	    devices = FTDevice.getDevices(true);
-	} catch (FTD2XXException e) {
-	    e.printStackTrace();
-	    return;
-	}
-	printInfo(devices);
-	System.out.println();
+	/* We print information about:
+	 * - all FTDI devices
+	 * - devices with the serial numbers we want
+	 * - devices with the descriptions we want. 
+	 * We sleep after each call just in case the
+	 *  boards can't keep up with the computer. */
 
-	System.out.println("Searching for A6007pN3...");
-	try {
-	    devices = FTDevice.getDevicesBySerialNumber("A6007pN3");
-	} catch (FTD2XXException e) {
-	    e.printStackTrace();
-	    return;
-	}
+	System.out.println("Finding all devices...");
+	devices = FTDevice.getDevices(true);
 	printInfo(devices);
-	System.out.println();
+	Thread.sleep(500);
 
-	System.out.println("Searching for A3000wLU...");
-	try {
-	    devices = FTDevice.getDevicesBySerialNumber("A3000wLU");
-	} catch (FTD2XXException e) {
-	    e.printStackTrace();
-	    return;
-	}
+	System.out.println("Searching for serial number A6007pN3...");
+	devices = FTDevice.getDevicesBySerialNumber("A6007pN3");
 	printInfo(devices);
-	System.out.println();
+	Thread.sleep(500);
 
-	System.out.println("Searching for FT232R USB UART...");
-	try {
-	    devices = FTDevice.getDevicesByDescription("FT232R USB UART");
-	} catch (FTD2XXException e) {
-	    e.printStackTrace();
-	    return;
-	}
+	System.out.println("Searching for serial number A3000wLU...");
+	devices = FTDevice.getDevicesBySerialNumber("A3000wLU");
 	printInfo(devices);
-	System.out.println();
+	Thread.sleep(500);
 
-	System.out.println("Searching for FT245R USB FIFO...");
-	try {
-	    devices = FTDevice.getDevicesByDescription("FT245R USB FIFO");
-	} catch (FTD2XXException e) {
-	    e.printStackTrace();
-	    return;
-	}
+	System.out.println("Searching for description FT232R USB UART...");
+	devices = FTDevice.getDevicesByDescription("FT232R USB UART");
 	printInfo(devices);
-	System.out.println();
+	Thread.sleep(500);
+
+	System.out.println("Searching for description FT245R USB FIFO...");
+	devices = FTDevice.getDevicesByDescription("FT245R USB FIFO");
+	printInfo(devices);
     }
 
     public static void printInfo(List<FTDevice> devices) {
@@ -64,10 +52,10 @@ public class ProbeFTDI {
 	    System.out.println(" has ID "+device.getDevID());
 	    System.out.println(" and type "+device.getDevType());
 	    if (device.isOpened())
-		System.out.println(" and it's taken");
+		System.out.println(" and it's already been opened.");
 	    else
-		System.out.println(" and it's available");
+		System.out.println(" and it's available.");
 	}
+	System.out.println();
     }
-
 }
