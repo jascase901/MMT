@@ -1,8 +1,8 @@
-MMT4/bin/
-MMT4/lib/
-MMT4/.settings
 
+MMT4/bin/
 MMT5/bin/
+MMT4/lib/
+MMT5/lib/
 *~
 \#*
 *.class
