@@ -3,41 +3,38 @@ package MMT.communications;
 import java.io.IOException;
 import java.util.Arrays;
 
-import com.ftdi.BitModes;
-import com.ftdi.FTD2XXException;
-import com.ftdi.FTDevice;
-import com.ftdi.Parity;
-import com.ftdi.StopBits;
-import com.ftdi.WordLength;
+import jd2xx.JD2XX;
 
 
 public class FTDI {
-    private static final FTDI INSTANCE = new FTDI();
-    private FTDevice ft232handle;
-    private FTDevice ft245handle;
-    public static FTDI getInstance() {return INSTANCE;}
-    
-    private FTDI() {
+    private static final String FT232_SERIAL_NUMBER = "A6007pN3";
+    private static final String FT245_SERIAL_NUMBER = "A3000wLU";
+    private static final JD2XX ft232handle = new JD2XX();
+    private static final JD2XX ft245handle = new JD2XX();
+
+    static {
         try {
-            ft232handle = FTDevice.getDevicesBySerialNumber("A6007pN3").get(0);
-            ft245handle = FTDevice.getDevicesBySerialNumber("A3000wLU").get(0);
-        } catch (FTD2XXException e1) {
-            e1.printStackTrace();
-        }
-        try {
-            ft232handle.open();
-            ft232handle.setBaudRate(9600);
-            ft232handle.setDataCharacteristics(WordLength.BITS_8, StopBits.STOP_BITS_1, Parity.PARITY_NONE);
-            
-            ft245handle.open();
-            ft245handle.setBitMode((byte) 0xFF, BitModes.BITMODE_ASYNC_BITBANG);
-        } catch (FTD2XXException e) {
+	    System.out.println("Opening "+FT232_SERIAL_NUMBER);
+	    ft232handle.openEx(FT232_SERIAL_NUMBER,
+			       JD2XX.OPEN_BY_SERIAL_NUMBER);
+	    System.out.println("Configuring");
+	    ft232handle.setBaudRate(JD2XX.BAUD_9600);
+	    ft232handle.setDataCharacteristics(JD2XX.BITS_8,
+					       JD2XX.STOP_BITS_1,
+					       JD2XX.PARITY_NONE);
+
+	    System.out.println("Opening "+FT245_SERIAL_NUMBER);
+	    ft245handle.openEx(FT245_SERIAL_NUMBER,
+			       JD2XX.OPEN_BY_SERIAL_NUMBER);
+	    System.out.println("Configuring");
+	    ft245handle.setBitMode((byte) 0xFF,
+				   JD2XX.BITMODE_ASYNC_BITBANG);
+        } catch (IOException e) {
             e.printStackTrace();
-        }
-        
+        }        
     }
     
-    public void close() {
+    public static void close() {
         try {
             ft245handle.close();
             ft232handle.close();
@@ -46,7 +43,7 @@ public class FTDI {
         }
     }
     
-    private void set245Port(int port) throws IOException {
+    private static void set245Port(int port) throws IOException {
         /* If I understand my predecessor's code correctly, the port is a one-byte unsigned integer,
          * and for some reason, the chip we're talking to reads that byte with big-endian bit order,
          * while our computer uses little-endian bit order (or maybe vice versa). Point is, we need
@@ -64,15 +61,7 @@ public class FTDI {
         //ft245handle.write(flipped);
     }
     
-    private void purge245() throws FTD2XXException {
-        ft245handle.purgeBuffer(true, true);
-    }
-    
-    private void purge232() throws FTD2XXException {
-        ft232handle.purgeBuffer(true, true);
-    }
-    
-    private void pause() {
+    private static void pause() {
         try {
             Thread.sleep(25);
         } catch (InterruptedException e) {
@@ -80,17 +69,16 @@ public class FTDI {
         }
     }
     
-    public void write(byte[] data, int port) throws IOException {
+    public static void write(byte[] data, int port) throws IOException {
         System.out.println(Arrays.toString(data));
-        purge245(); //remove any leftovers from the queues
-        purge232();
+	ft232handle.purge(JD2XX.PURGE_RX | JD2XX.PURGE_TX);
+	ft245handle.purge(JD2XX.PURGE_RX | JD2XX.PURGE_TX);
         set245Port(port);
         ft232handle.write(data);
-        pause(); //pause a bit so that when read() is called, there is something to be read
-        pause();
+        pause(); //pause a bit because serial communications are sloooooow
     }
     
-    public String read(int port) throws IOException {
+    public static String read(int port) throws IOException {
         set245Port(port);
         byte[] read = ft232handle.read(ft232handle.getQueueStatus());
         return new String(read);

@@ -150,7 +150,7 @@ public class ActuatorPanel extends JPanel implements ActionListener {
     private ArrayList<Actuator> findAllActuators() {
         ArrayList<Actuator> result = new ArrayList<Actuator>();
         for (int i=0; i<10; i++)
-            result.add(new Actuator(50000+i));
+            result.add(new Actuator(i));
         return result;
     }
 }

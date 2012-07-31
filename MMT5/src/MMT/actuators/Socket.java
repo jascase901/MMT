@@ -116,11 +116,6 @@ public class Socket {
     
     // Static stuff
     
-    // We use the same FTDI object to communicate with all the actuators.
-    // (I'm not really sure how the FTDI thing works, and I'm not keen on
-    //  having to learn. Sorry!)
-    private static final FTDI ftdi = FTDI.getInstance();
-    
     // simpleMessages and longMessages map their respective kinds of Command
     //  onto special byte arrays the actuator will interpret.
     private static final EnumMap<SimpleCommand, byte[]> simpleMessages
@@ -188,17 +183,17 @@ public class Socket {
     // write sends a command to the actuator. read pops a response off the queue.
     private void write(SimpleCommand command) throws IOException {
         this.lock.lock();
-        try {Socket.ftdi.write(Socket.buildSimpleMessage(command), this.port);}
+        try {FTDI.write(Socket.buildSimpleMessage(command), this.port);}
         finally {this.lock.unlock();}
     }
     private void write(LongCommand command, long x) throws IOException {
         this.lock.lock();
-        try {Socket.ftdi.write(Socket.buildLongMessage(command, x), this.port);}
+        try {FTDI.write(Socket.buildLongMessage(command, x), this.port);}
         finally {this.lock.unlock();}
     }
     private String read() throws IOException {
         this.lock.lock();
-        try {return Socket.ftdi.read(this.port);}
+        try {return FTDI.read(this.port);}
         finally {this.lock.unlock();}
     }
 }
