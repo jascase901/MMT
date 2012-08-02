@@ -45,6 +45,7 @@ public class TrackerPanel extends JPanel implements ActionListener {
     private JButton homeButton;
     private JButton moveButton;
     private JButton moveAbsoluteButton;
+    private JButton measureButton;
 
     // The box for selecting which measurement mode to set the tracker to:
     private JComboBox<String> modeBox;
@@ -77,6 +78,7 @@ public class TrackerPanel extends JPanel implements ActionListener {
         this.setModeButton = new SimpleButton("Set Mode", "setMode", this);
         
         this.modeBox = new JComboBox<String>(new String[] {"IFM", "ADM", "IFM set by ADM"});
+	this.measureButton = new SimpleButton("Measure", "measure", this);
         
         this.history = new HistoryPane();
         
@@ -90,7 +92,8 @@ public class TrackerPanel extends JPanel implements ActionListener {
                                                new Row(new JLabel("Theta (rad): "), this.thetaField),
                                                new Row(new JLabel("Phi (rad): "), this.phiField)), new Column(this.moveButton,
                                                                                                               this.moveAbsoluteButton)),
-                            new Row(this.modeBox, this.setModeButton)));
+                            new Row(this.modeBox, this.setModeButton),
+			    this.measureButton));
     }
     
     public void actionPerformed(ActionEvent e) {
@@ -233,6 +236,19 @@ public class TrackerPanel extends JPanel implements ActionListener {
                 }
             }).execute();
         }
+	else if (s.equals("measure")) {
+            (this.history.new Updater() {
+                @Override
+                public String getResult() {
+                    try {
+                        return "Distance is "+Double.toString(tracker.measure(1,1,1)[0].distance());
+		    }
+                    catch (TrackerException error) {
+                        return "TrackerException raised when measuring distance";
+                    }
+                }
+            }).execute();
+	}
     }
     
     public double getRadius() {

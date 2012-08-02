@@ -48,25 +48,25 @@ public class Actuator {
         }
     }
     
-    public String move(double microns) throws IOException {
+    public String move(double microns) throws IOException, InterruptedException {
         long steps = Math.round(microns * STEPS_PER_MICRON);
-        return this.socket.writeRead(Socket.LongCommand.MOVE, steps);
+        return this.socket.writeWaitRead(Socket.LongCommand.MOVE, steps, 100);
     }
-    public String moveAbsolute(double microns) throws IOException {
+    public String moveAbsolute(double microns) throws IOException, InterruptedException {
         long steps = Math.round(microns * STEPS_PER_MICRON);
-        return this.socket.writeRead(Socket.LongCommand.MOVE_ABSOLUTE, steps);
+        return this.socket.writeWaitRead(Socket.LongCommand.MOVE_ABSOLUTE, steps, 100);
     }
     public Status getStatus() throws IOException, InterruptedException {
         return new Status(this.socket.writeWaitRead(Socket.SimpleCommand.GET_STATUS, 100));
     }
-    public String turnMotorOn() throws IOException {
-        return this.socket.writeRead(Socket.SimpleCommand.MOTOR_ON);
+    public String turnMotorOn() throws IOException, InterruptedException {
+        return this.socket.writeWaitRead(Socket.SimpleCommand.MOTOR_ON, 100);
     }
-    public String turnMotorOff() throws IOException {
-        return this.socket.writeRead(Socket.SimpleCommand.MOTOR_OFF);
+    public String turnMotorOff() throws IOException, InterruptedException {
+        return this.socket.writeWaitRead(Socket.SimpleCommand.MOTOR_OFF, 100);
     }
-    public String turnMotorOffHard() throws IOException {
-        return this.socket.writeRead(Socket.SimpleCommand.MOTOR_OFF_HARD);
+    public String turnMotorOffHard() throws IOException, InterruptedException {
+        return this.socket.writeWaitRead(Socket.SimpleCommand.MOTOR_OFF_HARD, 100);
     }
     
     public String toString() {

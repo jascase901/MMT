@@ -96,15 +96,22 @@ public class ActuatorPanel extends JPanel implements ActionListener {
                     public String getResult() {
                         try {
                             if (s.equals("move")) {
-                                a.move(distance);
-                                return "Moved "+a.toString()+" "+distance+" microns.";
+				String tmp = a.move(distance);
+				System.out.println(tmp);
+				return tmp;
+				//a.move(distance);
+				//return "Moved "+a.toString()+" "+distance+" microns.";
                             } else {
-                                a.moveAbsolute(distance);
-                                return "Moved "+a.toString()+" "+distance+" microns (absolute).";
+				return a.moveAbsolute(distance);
+                                //a.moveAbsolute(distance);
+                                //return "Moved "+a.toString()+" "+distance+" microns (absolute).";
                             }
                         } catch (java.io.IOException error) {
+			    error.printStackTrace();
                             return "IOException thrown when moving "+a.toString();
-                        }
+                        } catch (java.lang.InterruptedException error) {
+			    return "Thread interrupted during write/read to "+a.toString();
+			}
                     }
                 }).execute();
             }
@@ -120,6 +127,7 @@ public class ActuatorPanel extends JPanel implements ActionListener {
                             return a.toString() + " gives status "
                                      + a.getStatus().toString();
                         } catch (java.io.IOException error) {
+			    error.printStackTrace();
                             return "IOException thrown when getting status of "
                                      +a.toString();
                         } catch (java.lang.InterruptedException error) {
@@ -149,7 +157,7 @@ public class ActuatorPanel extends JPanel implements ActionListener {
     //  to any actuator he wants.
     private ArrayList<Actuator> findAllActuators() {
         ArrayList<Actuator> result = new ArrayList<Actuator>();
-        for (int i=0; i<10; i++)
+        for (int i=192; i<=204; i+=2)
             result.add(new Actuator(i));
         return result;
     }
