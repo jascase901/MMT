@@ -12,13 +12,13 @@ import MMT.gui.HistoryPane;
 import MMT.gui.SimpleButton;
 import MMT.gui.boxes.Column;
 import MMT.gui.boxes.Row;
+import MMT.gui.JListPane;
 
+import java.util.List;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
-import javax.swing.JList;
 import javax.swing.JButton;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import java.awt.event.ActionListener;
@@ -35,8 +35,7 @@ public class ActuatorPanel extends JPanel implements ActionListener {
      * send commands to them. We keep the list of actuators as a List
      * because Lists are nice to deal with, but we also need to store
      * it in a JList for GUI-related purposes. */
-    public ArrayList<Actuator> actuatorList;
-    private JList<Actuator> actuatorJList;
+    private JListPane<Actuator> listPane;
     
     // And we have a HistoryPane for logging all our messages:
     private final HistoryPane history;
@@ -46,9 +45,7 @@ public class ActuatorPanel extends JPanel implements ActionListener {
     private JTextField micronField;
     
     // And buttons for sending commands to the actuators:
-    private JButton moveButton;
-    private JButton moveAbsoluteButton;
-    private JButton getStatusButton;
+    private JButton moveButton, moveAbsoluteButton, getStatusButton;
     
     public ActuatorPanel() {
         super();
@@ -57,8 +54,8 @@ public class ActuatorPanel extends JPanel implements ActionListener {
         
         // Build our list of all actuators as well as the JList to
         //  display it to the user:
-        this.actuatorList = this.findAllActuators();
-        this.actuatorJList = new JList<Actuator>(this.actuatorList.toArray(new Actuator[] {}));
+	this.listPane = new JListPane<Actuator>();
+	this.addAllActuators();
         
         // A SimpleButton is just a subclass of JButton with a nicer constructor:
         //  give it a name, a command message, and a listener for when it's clicked.
@@ -72,7 +69,7 @@ public class ActuatorPanel extends JPanel implements ActionListener {
          * (I've formatted the calls to Row and Column so that the layout of code
          *  here is roughly the same as the layout of components in the GUI.) */
         this.add(new Column(
-            new Row(new JScrollPane(this.actuatorJList), this.history),
+            new Row(this.listPane, this.history),
             new Row(this.micronField, new JLabel(" microns"), new Column(this.moveButton,
                                                                          this.moveAbsoluteButton)),
             this.getStatusButton));
@@ -88,7 +85,7 @@ public class ActuatorPanel extends JPanel implements ActionListener {
             final double distance = this.getMicrons();
             if (Double.isNaN(distance)) return; // Couldn't parse the field.
             
-            for (final Actuator a : this.actuatorJList.getSelectedValuesList()) {
+            for (final Actuator a : this.listPane.getSelectedValuesList()) {
                 /* A HistoryPanel.Updater will run its getResult method, then
                  * update the HistoryPanel with the string getResult returns. */
                 (this.history.new Updater() {
@@ -119,7 +116,7 @@ public class ActuatorPanel extends JPanel implements ActionListener {
         else if (s.equals("getStatus")) {
             // We just want to update the HistoryPane with the status
             // of each selected actuator.
-            for (final Actuator a : this.actuatorJList.getSelectedValuesList()) {
+            for (final Actuator a : this.listPane.getSelectedValuesList()) {
                 (this.history.new Updater() {
                     @Override
                     public String getResult() {
@@ -155,10 +152,10 @@ public class ActuatorPanel extends JPanel implements ActionListener {
     // findAllActuators returns a list of all the actuators we know about.
     // We need to maintain such a list so that the user can send commands
     //  to any actuator he wants.
-    private ArrayList<Actuator> findAllActuators() {
-        ArrayList<Actuator> result = new ArrayList<Actuator>();
-        for (int i=192; i<=204; i+=2)
-            result.add(new Actuator(i));
-        return result;
+    private void addAllActuators() {
+        for (int port=192; port<=204; port+=2) {
+	    Actuator actuator = new Actuator(port);
+	    this.listPane.addItem(Integer.toString(port), actuator);
+	}
     }
 }

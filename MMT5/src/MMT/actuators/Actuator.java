@@ -21,8 +21,10 @@ import java.lang.InterruptedException;
 public class Actuator {
     
     // PUBLIC API
-    
+
+    public final int port;
     public Actuator(int port) {
+	this.port = port;
         this.socket = new Socket(port);
     }
     
@@ -70,7 +72,7 @@ public class Actuator {
     }
     
     public String toString() {
-        return "Actuator("+this.socket.port+")";
+        return "Actuator("+this.port+")";
     }
     
     // PRIVATE STUFF
